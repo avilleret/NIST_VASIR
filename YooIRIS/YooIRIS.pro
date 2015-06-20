@@ -32,15 +32,15 @@ FORMS    += \
 # Analysis, MasekAlg, VASIR dependency
 
 
-CONFIG(debug) {	
-	LIBS += -L$$PWD/../Build/MasekAlg/debug/ -lMasekAlg
-	LIBS += -L$$PWD/../Build/VASIR/debug/ -lVASIR
-	LIBS += -L$$PWD/../Build/Analysis/debug/ -lAnalysis
-} else {	
-	LIBS += -L$$PWD/../Build/MasekAlg/release/ -lMasekAlg
+# CONFIG(debug) {
+# 	LIBS += -L$$PWD/../Build/VASIR/debug/ -lVASIR
+#         LIBS += -L$$PWD/../Build/MasekAlg/debug/ -lMasekAlg
+#         LIBS += -L$$PWD/../Build/Analysis/debug/ -lAnalysis
+# } else {
 	LIBS += -L$$PWD/../Build/VASIR/release/ -lVASIR
-	LIBS += -L$$PWD/../Build/Analysis/release/ -lAnalysis
-}
+        LIBS += -L$$PWD/../Build/MasekAlg/release/ -lMasekAlg
+        LIBS += -L$$PWD/../Build/Analysis/release/ -lAnalysis
+# }
 
 INCLUDEPATH += $$PWD/../Analysis $$PWD/../MasekAlg $$PWD/../VASIR
 DEPENDPATH += $$PWD/../Analysis $$PWD/../MasekAlg $$PWD/../VASIR
