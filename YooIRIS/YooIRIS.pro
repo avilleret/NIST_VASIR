@@ -73,6 +73,14 @@ else:mac {
 
 
 }
+else:linux {
+        LIBS += -L/opt/local/lib/ \
+        -lopencv_core \
+        -lopencv_imgproc \
+        -lopencv_highgui \
+        -lopencv_objdetect \
+        -lopencv_legacy
+}
 
 # OpenCV dependency
 
