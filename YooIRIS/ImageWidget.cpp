@@ -1,8 +1,8 @@
-#include <QPen.h>
-#include <QImage.h>
-#include <QPainter.h>
-#include <QColor.h>
-#include <QList.h>
+#include <QPen>
+#include <QImage>
+#include <QPainter>
+#include <QColor>
+#include <QList>
 
 #include <cstring>
 

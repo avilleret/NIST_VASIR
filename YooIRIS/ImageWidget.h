@@ -20,9 +20,9 @@
 #ifndef IMAGE_WIDGET_H
 #define IMAGE_WIDGET_H
 
-#include <QWidget.h>
-#include <QPainter.h>
-#include <QObject.h>
+#include <QWidget>
+#include <QPainter>
+#include <QObject>
 
 #include <opencv/cxcore.h>
 
