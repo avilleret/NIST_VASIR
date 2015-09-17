@@ -15,6 +15,7 @@ include_directories (
 )
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
 
 set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fPIC" )
 
@@ -22,19 +23,19 @@ set ( YooIRIS_HDRS
 	CVImageSource.h
 	ImageSource.h
 	ImageWidget.h
+	InputDialog.h
 	ModeDialog.h
 	YooIRIS.h
-  InputDialog.h
 )
 
 set ( YooIRIS_SRCS
-	main.cpp
 	CVImageSource.cpp
-  ImageWidget.cpp
+	ImageWidget.cpp
+	InputDialog.cpp
+	main.cpp
 	ModeDialog.cpp
 	YooIRIS.cpp
 	YooUtility.cpp
-	InputDialog.cpp
 )
 
 qt5_wrap_ui( YooIRIS_UI
