@@ -51,4 +51,3 @@ set ( VASIR_SRCS
 )
 
 add_library ( VASIR SHARED ${VASIR_SRCS} ${VASIR_HDRS} )
-target_link_libraries ( VASIR )

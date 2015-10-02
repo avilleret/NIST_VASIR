@@ -35,4 +35,3 @@ set ( MasekAlg_SRCS
 )
 
 add_library ( MasekAlg SHARED ${MasekAlg_SRCS} ${MasekAlg_HDRS} )
-target_link_libraries ( MasekAlg )
