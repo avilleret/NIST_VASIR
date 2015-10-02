@@ -33,7 +33,7 @@ YooIRIS::YooIRIS( QWidget* parent /*= 0*/, Qt::WindowFlags flags /*= 0*/ ) : QMa
 YooIRIS::~YooIRIS()
 {
 	//Memory error here ==>
-	if(eyeDetection != NULL)			
+	if(eyeDetection != NULL)
 		delete eyeDetection;
 
 	delete[] leftFileName1;
@@ -43,45 +43,45 @@ YooIRIS::~YooIRIS()
 }
 
 void YooIRIS::SelectCascade()
-{ 
+{
 	char* myCascadeFileName = openFileName("../bin/Cascade", "Open cascade XML file", "XML Files (*.xml)");
 	if(myCascadeFileName != NULL)
-	{    
+	{
 		// Release previously loaded cascade
-		if (eyeDetection != NULL)		
+		if (eyeDetection != NULL)
 			delete eyeDetection;
-		    
+
 		// Try to load the cascade
 		try
 		{
-			 eyeDetection = new EyeDetection(myCascadeFileName);
+			 eyeDetection = new EyeDetection("Cascade");
 		}
 		catch (const char* msg)
 		{
 			cout << "Error: Failed to load the cascade " << msg << endl;
-		}		
+		}
     }
 }
 
-// MENU: Selects best quality image from eye images detected 
+// MENU: Selects best quality image from eye images detected
 // in video file
 void YooIRIS::selectBestEye(IplImage* currentImg, int index, int &bestIndex, IplImage*& bestImg, double& bestScore)
 {
 	// Convert image to the gray scale
 	IplImage* grayImg = NULL;
 	grayImg = ImageUtility::convertToGray(currentImg);
-	
+
 	// Calculate the quality score
 	double score = ImageQuality::doProcess(grayImg, 0);//0: SOBEL
 	cout << "Quality score: " << score << endl;
-  
+
 	// Select the best image quality score
 	if (score > bestScore)
 	{
 		// Release previous - if any
-		if (bestImg != NULL)		
+		if (bestImg != NULL)
 			cvReleaseImage(&bestImg);
-		
+
 		// Copy the best image to bestImg
 		bestImg = cvCloneImage(currentImg);
 		bestScore = score;
@@ -99,18 +99,18 @@ void YooIRIS::selectBestEyePairImage(IplImage* currentImg, IplImage* currentPair
 	// Convert image to the gray scale
 	IplImage* grayImg = NULL;
 	grayImg = ImageUtility::convertToGray(currentImg);
-	
+
 	// Calculate the quality score
 	double score = ImageQuality::doProcess(grayImg, 0);//0: SOBEL
 	cout << "Quality score: " << score << endl;
-  
+
 	// Select the best image quality score
 	if (score > bestScore)
 	{
 		// Release previous - if any
-		if (bestImg != NULL)		
+		if (bestImg != NULL)
 			cvReleaseImage(&bestImg);
-		
+
 		// Copy the pair image to bestImg that selected by the left or right quality score
 		bestImg = cvCloneImage(currentPairImg);
 		bestScore = score;
@@ -147,18 +147,18 @@ void YooIRIS::loadVideoFile()
             gDataType1 = NIR_FACE_VIDEO;
             gDataType2 = NIR_FACE_VIDEO;
 
-			detectEyeRegion(videoFileName);			
+			detectEyeRegion(videoFileName);
 		}
 		catch (const char* msg)
 		{
 		  cout << "Error: Failed to load the video file " << msg << endl;
 		}
-	}	
+	}
 }
 
 //FUNCTION: Detects the eye region / extracts and saves it
 void YooIRIS::detectEyeRegion(char* fileName)
-{	
+{
 	// Video scales. 4: 2048x2048(MBGC Data), 2: 1024x1024, 1: 512x512
 	const int scales = 4;
 	// Eye region rectangl adjustment (pixel unit)
@@ -177,9 +177,9 @@ void YooIRIS::detectEyeRegion(char* fileName)
 	int indexLeft = -1;
 	int indexRight = -1;
 	double prevLeftScore = -1;
-    double prevRightScore = -1;	
+    double prevRightScore = -1;
     try
-    {      
+    {
 		// Check whether or not the cascade was loaded
 		if(!eyeDetection)
 		{
@@ -191,22 +191,22 @@ void YooIRIS::detectEyeRegion(char* fileName)
 			// Load Video file to Qt
 			imgSrc = new CVVideoSource(fileName);
 			cout << "Number of frames: " << imgSrc->getNumberOfImages() << endl;
- 
+
 			int i = 1; //Number of detected images
 			int j = 1; //Frame number that contains the detected eye
-			while (imgSrc->hasNextImage()) 
+			while (imgSrc->hasNextImage())
 			{
 
-				img = imgSrc->getNextImage();//\todo Confirm this one				
+				img = imgSrc->getNextImage();//\todo Confirm this one
 
                 if (img == NULL)
                 {
                     cerr << "There is no more next image" << endl;
                 }
                 if(img != NULL)
-				{ 					
+				{
 				   EyeDetection::RESULT* res = NULL;
-				   res = eyeDetection->detect(img, scales, val, w, h);	           
+				   res = eyeDetection->detect(img, scales, val, w, h);
 				   // Draw the current frame
 				   imgWidget->setImage(img); // Don't forget this
 
@@ -215,17 +215,17 @@ void YooIRIS::detectEyeRegion(char* fileName)
 					 cerr << "No eyes were detected" << endl;
 				   }
 				   else
-				   {  
-						// Draw rectangles for each detected eye region  
+				   {
+						// Draw rectangles for each detected eye region
 						imgWidget->addRectange(res->leftRect);
                         imgWidget->addRectange(res->rightRect);
                         cout << "Index: " << i << endl;
-						
+
                         //select the best-eye image without the pupil position alignment
                         selectBestEye(res->leftImg, i, indexLeft, imgForLeftEye, prevLeftScore);
                         selectBestEye(res->rightImg, i, indexRight, imgForRightEye, prevRightScore);
 
-						//select the best-eye image with the pupil position alignment						
+						//select the best-eye image with the pupil position alignment
                         //selectBestEyePairImage(res->leftImg, res->bothImg, i, indexLeft, imgForLeftEye, prevLeftScore);
                         //selectBestEyePairImage(res->rightImg, res->bothImg, i, indexRight, imgForRightEye, prevRightScore);
 
@@ -235,27 +235,27 @@ void YooIRIS::detectEyeRegion(char* fileName)
 						ImageUtility::SaveImageOptions(res->leftImg, fileName, j, "L", i, imgSrc->getNumberOfImages());
 						ImageUtility::SaveImageOptions(res->rightImg, fileName, j, "R", i, imgSrc->getNumberOfImages());
 						#endif
-												
-						i++;						
+
+						i++;
 
 						cvReleaseImage(&res->leftImg);
 						cvReleaseImage(&res->rightImg);
                         cvReleaseImage(&res->bothImg);
-						
+
 					}
-					imgWidget->repaint();				    
+					imgWidget->repaint();
 				}
                 j++;
-				
+
 			}//while
             imgWidget->reset();
             imgWidget->repaint();
 
             // Change current tab
             tabWidget->setCurrentIndex(1);
-						
+
 			cout << "Selected Index for Left: " << indexLeft << "    Selected Index for Right: " << indexRight << endl;
-			
+
 
             drawBestImage(fileName, indexLeft, indexRight, imgForLeftEye, imgForRightEye);
             cvReleaseImage(&imgForLeftEye);
@@ -268,7 +268,7 @@ void YooIRIS::detectEyeRegion(char* fileName)
             alignExractEyeImage(imgForLeftEye, imgForRightEye, NIR_FACE_VIDEO, "bmp", extractedLeftImg, extractedRightImg);
             cvReleaseImage(&imgForLeftEye);
             cvReleaseImage(&imgForRightEye);
-			
+
 			// Draw best-eye image
             drawBestImage(fileName, indexLeft, indexRight, extractedLeftImg, extractedRightImg);//with pupil alignment
             cvReleaseImage(&extractedLeftImg);
@@ -279,10 +279,10 @@ void YooIRIS::detectEyeRegion(char* fileName)
     catch (const char* msg)
     {
       cout << "Error: " << msg << endl;
-    }		
-    
+    }
+
 	if(imgSrc != NULL)
-		delete imgSrc; 
+		delete imgSrc;
 }
 
 //Align the left and right eye position using pupil information and then extract the eye region
@@ -292,10 +292,10 @@ void YooIRIS::alignExractEyeImage(IplImage* currentLeftPairImg, IplImage* curren
 	IplImage* rImg1 = NULL;
 	IplImage* lImg1 = NULL;
 
-	float nScale = 1.0;		
+	float nScale = 1.0;
 	const int speed_m = 1;// Default 1
 	const int alpha = 20; // Alpha value for contrast threshold
-	// Setup the parameters to avoid that noise caused by reflections and 
+	// Setup the parameters to avoid that noise caused by reflections and
     // eyelashes covers the pupil
     double ratio4Circle = 1.0;
     // Initialize for Closing and Opening process
@@ -319,14 +319,14 @@ void YooIRIS::alignExractEyeImage(IplImage* currentLeftPairImg, IplImage* curren
 		openItr = 3;
 	}
 
-	int rPupilMax = (int) (42*nScale); 
+	int rPupilMax = (int) (42*nScale);
 	int rIrisMax = (int) (82*nScale);
-	
+
 	//Extract the left eye image-> best left or right image can be from different frame
 	EyeRegionExtraction::doExtract(currentLeftPairImg, rPupilMax, rIrisMax, ratio4Circle, closeItr, openItr, speed_m, alpha, norm, nScale, imageFormat, lImg, rImg1);
 	//Extract the right eye image
 	EyeRegionExtraction::doExtract(currentRightPairImg, rPupilMax, rIrisMax,  ratio4Circle, closeItr, openItr, speed_m, alpha, norm, nScale, imageFormat, lImg1, rImg);
-	
+
 	cvReleaseImage(&lImg1);
 	cvReleaseImage(&rImg1);
 }
@@ -335,7 +335,7 @@ void YooIRIS::alignExractEyeImage(IplImage* currentLeftPairImg, IplImage* curren
 void YooIRIS::drawBestImage(char* fileName, int indexLeft, int indexRight, IplImage* imgLeft, IplImage* imgRight)
 {
 	if(imgLeft != NULL)
-	{ 	
+	{
         Ui_YooIRIS::imgLeftWidget1->setImage(imgLeft, true);
 		Ui_YooIRIS::imgLeftWidget1->repaint();
 		if (leftFileName1 != NULL)
@@ -350,7 +350,7 @@ void YooIRIS::drawBestImage(char* fileName, int indexLeft, int indexRight, IplIm
 		leftFileName1 = ImageUtility::SaveEyeImages(imgLeft, fileName, temp, "bmp");
 	}
 	if(imgRight != NULL)
-	{        
+	{
         Ui_YooIRIS::imgRightWidget1->setImage(imgRight, true);
 		Ui_YooIRIS::imgRightWidget1->repaint();
 		if (rightFileName1 != NULL)
@@ -363,17 +363,17 @@ void YooIRIS::drawBestImage(char* fileName, int indexLeft, int indexRight, IplIm
 		const char* temp = buffer;
 		// Save best right eye image
 		rightFileName1 = ImageUtility::SaveEyeImages(imgRight, fileName, temp, "bmp");
-	}	
+	}
 }
 
 //MENU:  \todo Future work
 void YooIRIS::OpenIrisAVIFile()
-{ 
+{
 }
 
 //MENU:  \todo Future work
 void YooIRIS::OpenCAM()
-{     
+{
 }
 
 //MENU: Image Quality Measurement using Sobel operator
@@ -418,22 +418,22 @@ void YooIRIS::StartMatch()
 	{
 		//Load the query image
 		openLeftEye2();
-		
+
 		if(leftFileName2 != NULL && pDataType1 != 0)
-		{				
+		{
 			double leftHD = 0.0;
 			leftHD = MatchAlg::mainMatchAlg((char*)leftFileName1, (char*)leftFileName2,
 										gDataType1, pDataType1);
 			if(leftHD != -1 && leftHD < thresholdHD)
 			{
 				txtLeftResult->setText("Match");
-				txtLeftResult->setStyleSheet("QLabel {background-color: #33CC00}"); 
+				txtLeftResult->setStyleSheet("QLabel {background-color: #33CC00}");
 			}
 			else
 			{
 				txtLeftResult->setText("No Match");
-				txtLeftResult->setStyleSheet("QLabel {background-color: #FF3300}"); 
-			}		
+				txtLeftResult->setStyleSheet("QLabel {background-color: #FF3300}");
+			}
 		}
 	}
 }
@@ -444,9 +444,9 @@ void YooIRIS::goMatch()
 	// \todo Possible to optimize?
 	const double thresholdHD = 0.39;
 	double leftHD = 0.0;
-	double rightHD = 0.0;	
-	
-	if((leftFileName1==NULL && leftFileName2==NULL 
+	double rightHD = 0.0;
+
+	if((leftFileName1==NULL && leftFileName2==NULL
 		&& rightFileName1==NULL && rightFileName2==NULL)
 		|| (leftFileName1 != NULL && leftFileName2 == NULL)
 		|| (leftFileName1 == NULL && leftFileName2 != NULL)
@@ -459,62 +459,62 @@ void YooIRIS::goMatch()
 
 	if(leftFileName1 != NULL && leftFileName2 != NULL)
 	{
-		
+
 		leftHD = MatchAlg::mainMatchAlg((char*)leftFileName1, (char*)leftFileName2,
 										gDataType1, pDataType1);
 		if(leftHD != -1 && leftHD < thresholdHD)
 		{
-			 
+
 			txtLeftResult->setText("Match");
-			txtLeftResult->setStyleSheet("QLabel {background-color: #33CC00}"); 
+			txtLeftResult->setStyleSheet("QLabel {background-color: #33CC00}");
 		}
 		else
 		{
-			
+
 			txtLeftResult->setText("No Match");
-			txtLeftResult->setStyleSheet("QLabel {background-color: #FF3300}"); 
-		}			
-	
+			txtLeftResult->setStyleSheet("QLabel {background-color: #FF3300}");
+		}
+
 	}
 	if(rightFileName1 != NULL && rightFileName2 != NULL)
 	{
 		rightHD = MatchAlg::mainMatchAlg((char*)rightFileName1, (char*)rightFileName2,
 										gDataType2, pDataType2);
-		
+
 		if(rightHD != -1 && rightHD < thresholdHD)
 		{
 			txtRightResult->setText("Match");
-			txtRightResult->setStyleSheet("QLabel {background-color: #33CC00}");                  
+			txtRightResult->setStyleSheet("QLabel {background-color: #33CC00}");
 		}
 		else
 		{
 			txtRightResult->setText("No Match");
-			txtRightResult->setStyleSheet("QLabel {background-color: #FF3300}"); 
+			txtRightResult->setStyleSheet("QLabel {background-color: #FF3300}");
 		}
-	}	
+	}
 }
 
 //BUTTON: Opens the image selected in dialog
 void YooIRIS::openLeftEye1()
-{  
+{
 	gDataType1 = 0;
-	gDataType1 = getDataType();	
+	gDataType1 = getDataType();
 	if(gDataType1 == 0)
 	{
 		cout << "Failed to load the data type" << endl;
 		return;
 	}
-	leftFileName1 = NULL;  
+	leftFileName1 = NULL;
 	const char* dir = "../../../Samples/";
 	leftFileName1 = drawEyeImage(this->imgLeftWidget1, "Open target image", dir);
-	
+
 	if(leftFileName1==NULL)
 	{
 		cout << "Failed to load the target image file" << endl;
 		return;
 	}
 	txtLeftDataType1->setText(txtDataType(gDataType1));
-	
+
 }
 
 // BUTTON: Opens the image selected in dialog
@@ -535,7 +535,7 @@ void YooIRIS::openLeftEye2()
 		cout << "Failed to load the query image file" << endl;
 		return;
 	}
-	txtLeftDataType2->setText(txtDataType(pDataType1)); 
+	txtLeftDataType2->setText(txtDataType(pDataType1));
 }
 
 // BUTTON: Opens the image selected in dialog
@@ -600,10 +600,10 @@ char* YooIRIS:: drawEyeImage(ImageWidget *imgWidget, const char* title, const ch
 		IplImage* img = NULL;
 		img = matchData.imgMatch;
 		char* eyeFileName = matchData.matchFileName;
-		imgWidget->setImage(img);		
+		imgWidget->setImage(img);
 		imgWidget->repaint();
 		cvReleaseImage(&img);
-		return eyeFileName;		 
+		return eyeFileName;
 	}
 	return NULL;
 }
@@ -612,8 +612,8 @@ char* YooIRIS:: drawEyeImage(ImageWidget *imgWidget, const char* title, const ch
 YooIRIS::MATCHDATA YooIRIS::getEyeImage(const char* title, const char* dir)
 {
 	YooIRIS::MATCHDATA matchData;
-	matchData.imgMatch = NULL;	
-	matchData.matchFileName = NULL;		
+	matchData.imgMatch = NULL;
+	matchData.matchFileName = NULL;
 	char* myFileName = openFileName(dir, title, "images (*.bmp *.tiff *.jpg *.pgm)");
 
 	if(myFileName != NULL)
@@ -625,8 +625,8 @@ YooIRIS::MATCHDATA YooIRIS::getEyeImage(const char* title, const char* dir)
 		if(matchData.imgMatch == NULL)
 		{
 			cout << "Faliled to load the image file" << endl;
-		}			
-		return matchData;		
+		}
+		return matchData;
 	}
 	return matchData;
 }
@@ -639,7 +639,7 @@ int YooIRIS::getDataType()
 	//select the finger mode
 	ModeDialog* dlg = new ModeDialog(this);
 	int ret = dlg->exec();
-	if (ret == QDialog::Accepted) 
+	if (ret == QDialog::Accepted)
 	{
 		mode = dlg->getMode();
 	}
