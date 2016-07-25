@@ -150,8 +150,8 @@ Masek::filter * Masek::imresize(filter *im, double scaling)
 			{
 				free(im->data);
 				free(im);
-				free(newim);
-				free(newim->data);
+                free(newim->data);
+                free(newim);
 				return NULL;
 			}
 				
