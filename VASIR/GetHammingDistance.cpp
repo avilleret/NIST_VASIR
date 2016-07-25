@@ -168,7 +168,7 @@ double GetHammingDistance::computeHDXorY(const MatchingTemplate* classTemplate1,
 	double xHD = computeHDX(classTemplate1, classTemplate2, scales);
 	double yHD = computeHDY(classTemplate1, classTemplate2, scales);
 	
-	double hd = (xHD < yHD) ? hd = xHD : hd = yHD;
+    double hd = (xHD < yHD) ? xHD : yHD;
 
 	return hd;
 }
