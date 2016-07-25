@@ -366,10 +366,10 @@ double FindEyelidCurve::LagrangeInterpolation(double *x, double *f, int n, doubl
 	int i,j;
 	double fx = 0.0;
 	double l = 1.0;
-	for (i=0; i<=n; i++)
+    for (i=0; i<n; i++)
 	{
 		l=1.0;
-		for (j=0; j<=n; j++)
+        for (j=0; j<n; j++)
 			 if (j != i) l *= (xbar-x[j])/(x[i]-x[j]);
 		
 		fx += l*f[i];
